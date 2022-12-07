@@ -2,24 +2,29 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const fs = require("fs");
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json())
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.get("/employe", (req, res) => {
+app.get("/employee", (req, res) => {
   fs.readFile("count", "utf8", (err, data) => {
     const alldata = JSON.parse(data);
-    res.send(JSON.stringify(alldata.employ));
+    res.send(JSON.stringify(alldata.employee));
   });
 });
 
-app.get("/add-employ/:name", (req, res) => {
+app.post("/add-employee", (req, res) => {
   fs.readFile("count", "utf8", (err, data) => {
     const alldata = JSON.parse(data);
-    alldata.employ.push(req.params.name);
+    const employeeData=req.body;
+    employeeData.id=alldata.employee.length+1;
+    alldata.employee.push(employeeData);
     fs.writeFile("count", JSON.stringify(alldata), () => {});
-    res.send(`${req.params.name} added`);
+    res.send(`${req.body.name} added`);
   });
 });
 app.listen(port, () => {
